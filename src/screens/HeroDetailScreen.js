@@ -1,31 +1,42 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { heroes } from '../data/heroes';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { API_URL } from '../services/api';
 
 export default function HeroDetailScreen({ route }) {
-  const { heroId } = route.params;
-  const hero = heroes.find((h) => h.id === heroId);
+  const { heroId, heroName } = route.params;
+  const [counters, setCounters] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!hero) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Herói não encontrado</Text>
-      </View>
-    );
+  useEffect(() => {
+    fetch(`${API_URL}/herois/${heroId}/counters`)
+      .then(response => response.json())
+      .then(data => {
+        setCounters(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Erro ao buscar counters:", error);
+        setLoading(false);
+      });
+  }, [heroId]);
+
+  if (loading) {
+    return <View style={styles.container}><ActivityIndicator size="large" color="#e62429" /></View>;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Counters para {hero.name}</Text>
+      <Text style={styles.title}>Counters para {heroName}</Text>
       <FlatList
-        data={hero.counters}
+        data={counters}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.counterCard}>
-            <Text style={styles.counterName}>{item.name}</Text>
-            <Text style={styles.tip}>{item.tip}</Text>
+            <Text style={styles.counterName}>{item.counter_nome} ({item.counter_funcao})</Text>
+            <Text style={styles.tip}>{item.dica_tatica}</Text>
           </View>
         )}
+        ListEmptyComponent={<Text style={styles.tip}>Nenhum counter cadastrado.</Text>}
       />
     </View>
   );
