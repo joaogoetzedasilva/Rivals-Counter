@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 import { API_URL } from '../services/api';
+import Card from '../components/Card';
 
 export default function HeroesListScreen({ navigation }) {
   const [herois, setHerois] = useState([]);
@@ -24,7 +25,7 @@ export default function HeroesListScreen({ navigation }) {
     carregarHerois();
   }, []);
 
-  // Recarrega a lista sempre que a tela volta a ficar visível (ex: após cadastrar)
+  // Recarrega a lista quando a tela volta a ficar visível
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       carregarHerois();
@@ -50,13 +51,11 @@ export default function HeroesListScreen({ navigation }) {
           </TouchableOpacity>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.card} 
-            onPress={() => navigation.navigate('HeroDetail', { heroId: item.id, heroName: item.nome })}
-          >
-            <Text style={styles.name}>{item.nome}</Text>
-            <Text style={styles.role}>{item.funcao}</Text>
-          </TouchableOpacity>
+          <Card 
+            title={item.nome} 
+            subtitle={item.funcao} 
+            onPress={() => navigation.navigate('HeroDetail', { heroId: item.id, heroName: item.nome })} 
+          />
         )}
       />
     </View>
@@ -67,7 +66,4 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0b0f1a', padding: 16 },
   addButton: { backgroundColor: '#e62429', padding: 14, borderRadius: 8, marginBottom: 16 },
   addButtonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold', fontSize: 16 },
-  card: { backgroundColor: '#1c2333', padding: 16, borderRadius: 10, marginBottom: 10 },
-  name: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  role: { color: '#e62429', marginTop: 4, fontWeight: 'bold' },
 });
