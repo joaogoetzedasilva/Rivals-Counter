@@ -20,15 +20,14 @@ export default function LoginScreen({ navigation }) {
       const data = await response.json();
 
       if (response.ok) {
-        // Salva o token e os dados do usuário no celular
         await AsyncStorage.setItem('@rivals_token', data.token);
         await AsyncStorage.setItem('@rivals_user', JSON.stringify(data.usuario));
         navigation.navigate('HeroesList');
       } else {
-        Alert.alert('Erro', data.error);
+        alert(data.error); // Usando alert simples para funcionar na web
       }
     } catch (error) {
-      Alert.alert('Erro', 'Falha na conexão.');
+      alert('Falha na conexão.');
     } finally {
       setLoading(false);
     }
@@ -42,6 +41,11 @@ export default function LoginScreen({ navigation }) {
       
       <TouchableOpacity style={styles.button} onPress={fazerLogin} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
+      </TouchableOpacity>
+
+      {/* BOTÃO DE CADASTRO AQUI */}
+      <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} style={{ marginTop: 20 }}>
+        <Text style={{ color: '#e62429', textAlign: 'center', fontWeight: 'bold' }}>Não tem conta? Cadastre-se</Text>
       </TouchableOpacity>
     </View>
   );

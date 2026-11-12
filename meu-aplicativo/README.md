@@ -17,31 +17,57 @@ Um aplicativo mobile de consulta rápida que lista todos os heróis do jogo. Ao 
 **Rivals Counter**
 
 ## 6. Tipos de usuário
-1. **Jogador (Usuário Comum):** Pode visualizar a lista de heróis e seus counters.
-2. **Administrador:** Pode adicionar, editar ou remover heróis e counters.
+1. **Jogador (Usuário Comum):** Pode criar uma conta, fazer login e visualizar a lista de heróis e seus counters.
+2. **Administrador:** Pode adicionar, editar ou remover heróis e counters, além de ter as permissões do jogador comum.
 
-## 7. Permissões iniciais
-* **Jogador:** Acesso à consulta (GET).
-* **Administrador:** Acesso à consulta e cadastro (GET e POST).
+## 7. Funcionalidades Implementadas (Atualizado)
+*   **Autenticação JWT:** Cadastro e login de usuários com senhas criptografadas (hash com bcrypt) e geração de Token JWT.
+*   **Níveis de Acesso:** Rotas protegidas no backend que diferenciam usuários comuns de administradores.
+*   **CRUD de Heróis:** Listagem, cadastro, edição e exclusão de heróis (apenas admins podem modificar).
+*   **CRUD de Counters:** Associação de um herói como "counter" de outro, com dicas táticas. Edição e exclusão disponíveis para admins.
+*   **Melhorias de UX:** Seleção de heróis via lista (modal) em vez de digitar IDs, e confirmações customizadas que funcionam na versão Web.
 
-## 8. Principais funcionalidades
-* Listagem de heróis dividida por funções (Vanguard, Duelist, Strategist).
-* Tela de detalhes com a lista de counters e descrições táticas.
-* Cadastro de novos heróis (apenas Admin).
+## 8. Telas do Aplicativo
+*   **Tela 1:** Login.
+*   **Tela 2:** Cadastro de Novo Usuário.
+*   **Tela 3:** Lista de Heróis.
+*   **Tela 4:** Detalhes do Herói (lista de counters).
+*   **Tela 5:** Cadastro de Herói (Admin).
+*   **Tela 6:** Edição de Herói (Admin).
+*   **Tela 7:** Cadastro de Counter (Admin).
+*   **Tela 8:** Edição de Counter (Admin).
 
-## 9. Telas previstas
-* **Tela 1:** Login.
-* **Tela 2:** Lista de Heróis.
-* **Tela 3:** Detalhes do Herói (counters).
-* **Tela 4:** Cadastro de Herói (Admin).
+## 9. Fluxo de Navegação
+`Tela de Login` ➔ `Tela de Cadastro (Opcional)` ➔ `Tela de Lista de Heróis` ➔ `Tela de Detalhes (Counters)` ➔ `Ações de Admin (se aplicável)`
 
-## 10. Fluxo inicial de navegação
-`Tela de Login` ➔ `Tela de Lista de Heróis` ➔ `Tela de Detalhes (Counters)`
+## 10. Tecnologias Utilizadas
+*   **Frontend:** React Native com Expo, React Navigation, AsyncStorage.
+*   **Backend:** Node.js, Express, JWT (jsonwebtoken), BcryptJS.
+*   **Banco de Dados:** MySQL (mysql2).
 
 ---
+
 ## Como rodar o projeto
-1. Crie o banco de dados executando o script `database.sql`.
-2. Na pasta `backend`, crie um arquivo `.env` com as credenciais do seu MySQL.
-3. Rode `npm install` na raiz e na pasta `backend`.
-4. Inicie a API: `cd backend` e `node server.js`.
-5. Inicie o app: `npx expo start`.
+
+### Pré-requisitos
+*   Node.js instalado.
+*   MySQL instalado e rodando.
+*   Expo Go instalado no celular (ou emulador).
+
+### Passo a Passo
+
+**1. Configurar o Banco de Dados**
+*   Abra o seu gerenciador do MySQL (Workbench, phpMyAdmin, etc).
+*   Execute o script `database.sql` que está na raiz do projeto para criar o banco e as tabelas.
+*   **Nota:** O script já inclui as chaves estrangeiras com `ON DELETE CASCADE` para que a exclusão de heróis funcione corretamente.
+
+**2. Configurar o Backend**
+*   Abra a pasta `backend` no terminal.
+*   Crie um arquivo chamado `.env` e adicione as variáveis de ambiente (veja o exemplo `.env.example` abaixo):
+    ```env
+    DB_HOST=localhost
+    DB_PORT=3306
+    DB_USER=root
+    DB_PASSWORD=sua_senha_aqui
+    DB_NAME=rivals_counter
+    JWT_SECRET=sua_chave_secreta_jwt_aqui

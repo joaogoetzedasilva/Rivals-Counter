@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchComToken } from '../services/api';
@@ -10,8 +10,11 @@ export default function HeroDetailScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
   
+  // Controle dos Modais
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalConfirmVisible, setModalConfirmVisible] = useState(false);
   const [counterSelecionado, setCounterSelecionado] = useState(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   async function carregarCounters() {
     setLoading(true);
@@ -21,16 +24,13 @@ export default function HeroDetailScreen({ route, navigation }) {
     try {
       const response = await fetchComToken(`/herois/${heroId}/counters`);
       const data = await response.json();
-      
-      // Verifica se a resposta é um array antes de setar (proteção contra erros da API)
       if (Array.isArray(data)) {
         setCounters(data);
       } else {
         setCounters([]);
       }
     } catch (error) {
-      console.error("Erro detalhado:", error);
-      Alert.alert('Erro', 'Não foi possível carregar os counters.');
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -48,17 +48,6 @@ export default function HeroDetailScreen({ route, navigation }) {
     setModalVisible(true);
   }
 
-  async function excluirCounter() {
-    setModalVisible(false);
-    Alert.alert('Excluir', 'Tem certeza que deseja excluir este counter?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Sim', onPress: async () => {
-          await fetchComToken(`/counters/${counterSelecionado.id}`, { method: 'DELETE' });
-          carregarCounters();
-      }}
-    ]);
-  }
-
   function editarCounter() {
     setModalVisible(false);
     navigation.navigate('EditarCounter', { 
@@ -68,6 +57,30 @@ export default function HeroDetailScreen({ route, navigation }) {
       counterHeroId: counterSelecionado.counter_hero_id, 
       dicaAtual: counterSelecionado.dica_tatica 
     });
+  }
+
+  function pedirConfirmacaoExclusao() {
+    setModalVisible(false);
+    setModalConfirmVisible(true);
+  }
+
+  async function executarExclusao() {
+    setExcluindo(true);
+    try {
+      const res = await fetchComToken(`/counters/${counterSelecionado.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setModalConfirmVisible(false);
+        carregarCounters(); 
+      } else {
+        alert('Falha ao excluir.');
+        setModalConfirmVisible(false);
+      }
+    } catch (err) {
+      alert('Falha na conexão.');
+      setModalConfirmVisible(false);
+    } finally {
+      setExcluindo(false);
+    }
   }
 
   if (loading) return <View style={styles.container}><ActivityIndicator size="large" color="#e62429" /></View>;
@@ -88,7 +101,6 @@ export default function HeroDetailScreen({ route, navigation }) {
 
       <FlatList
         data={counters}
-        // CORRIGIDO AQUI: Protege contra item.id ser undefined
         keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
         ListEmptyComponent={<Text style={{ color: '#fff', textAlign: 'center', marginTop: 20 }}>Nenhum counter cadastrado para este herói.</Text>}
         renderItem={({ item }) => (
@@ -107,22 +119,44 @@ export default function HeroDetailScreen({ route, navigation }) {
         )}
       />
 
+      {/* MODAL 1: OPÇÕES */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Counter: {counterSelecionado?.counter_nome}</Text>
+            <Text style={styles.modalTitle}>Ações para {counterSelecionado?.counter_nome}</Text>
             
             <TouchableOpacity style={styles.modalButton} onPress={editarCounter}>
               <Ionicons name="pencil" size={20} color="#3b82f6" />
               <Text style={styles.modalButtonText}>Editar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.modalButton} onPress={excluirCounter}>
+            <TouchableOpacity style={styles.modalButton} onPress={pedirConfirmacaoExclusao}>
               <Ionicons name="trash" size={20} color="#e62429" />
               <Text style={styles.modalButtonText}>Excluir</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL 2: CONFIRMAÇÃO DE EXCLUSÃO */}
+      <Modal visible={modalConfirmVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Tem certeza?</Text>
+            <Text style={{ color: '#ccc', textAlign: 'center', marginBottom: 20 }}>
+              Deseja realmente excluir este counter?
+            </Text>
+            
+            <TouchableOpacity style={styles.modalButton} onPress={executarExclusao} disabled={excluindo}>
+              <Ionicons name="checkmark-circle" size={20} color="#e62429" />
+              <Text style={styles.modalButtonText}>{excluindo ? 'Excluindo...' : 'Sim, excluir'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalConfirmVisible(false)}>
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
