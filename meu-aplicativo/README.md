@@ -17,31 +17,35 @@ Um aplicativo mobile de consulta rápida que lista todos os heróis do jogo. Ao 
 **Rivals Counter**
 
 ## 6. Tipos de usuário
-1. **Jogador (Usuário Comum):** Pode criar uma conta, fazer login e visualizar a lista de heróis e seus counters.
+1. **Jogador (Usuário Comum):** Pode criar uma conta, fazer login e visualizar a lista de heróis, filtrar por função e consultar os counters.
 2. **Administrador:** Pode adicionar, editar ou remover heróis e counters, além de ter as permissões do jogador comum.
 
-## 7. Funcionalidades Implementadas (Atualizado)
+## 7. Funcionalidades Implementadas
 *   **Autenticação JWT:** Cadastro e login de usuários com senhas criptografadas (hash com bcrypt) e geração de Token JWT.
 *   **Níveis de Acesso:** Rotas protegidas no backend que diferenciam usuários comuns de administradores.
 *   **CRUD de Heróis:** Listagem, cadastro, edição e exclusão de heróis (apenas admins podem modificar).
 *   **CRUD de Counters:** Associação de um herói como "counter" de outro, com dicas táticas. Edição e exclusão disponíveis para admins.
-*   **Melhorias de UX:** Seleção de heróis via lista (modal) em vez de digitar IDs, e confirmações customizadas que funcionam na versão Web.
+*   **Fotos de Heróis:** Opção de cadastrar a URL da foto do herói. Caso não seja informada, o app usa uma imagem padrão.
+*   **Organização Visual (SectionList):** A lista de heróis é dividida em seções (Tanques, Dano, Suporte) e ordenada alfabeticamente dentro de cada seção.
+*   **Filtro de Função:** Tela inicial após o login permite escolher qual classe visualizar (Todas, Vanguard, Duelist, Strategist).
+*   **Melhorias de UX:** Modais customizados para confirmação e feedback (funcionam perfeitamente na versão Web), evitando bugs com o `Alert.alert` nativo.
 
 ## 8. Telas do Aplicativo
-*   **Tela 1:** Login.
-*   **Tela 2:** Cadastro de Novo Usuário.
-*   **Tela 3:** Lista de Heróis.
-*   **Tela 4:** Detalhes do Herói (lista de counters).
-*   **Tela 5:** Cadastro de Herói (Admin).
-*   **Tela 6:** Edição de Herói (Admin).
-*   **Tela 7:** Cadastro de Counter (Admin).
-*   **Tela 8:** Edição de Counter (Admin).
+*   **Tela 1:** Login (com fundo personalizado).
+*   **Tela 2:** Cadastro de Novo Usuário (mesmo visual do Login).
+*   **Tela 3:** Seleção de Função (escolher qual classe ver).
+*   **Tela 4:** Lista de Heróis (organizada por seções e com fotos).
+*   **Tela 5:** Detalhes do Herói (lista de counters com fotos e dicas).
+*   **Tela 6:** Cadastro de Herói (Admin).
+*   **Tela 7:** Edição de Herói (Admin).
+*   **Tela 8:** Cadastro de Counter (Admin).
+*   **Tela 9:** Edição de Counter (Admin).
 
 ## 9. Fluxo de Navegação
-`Tela de Login` ➔ `Tela de Cadastro (Opcional)` ➔ `Tela de Lista de Heróis` ➔ `Tela de Detalhes (Counters)` ➔ `Ações de Admin (se aplicável)`
+`Tela de Login` ➔ `Tela de Cadastro (Opcional)` ➔ `Tela de Seleção de Função` ➔ `Tela de Lista de Heróis` ➔ `Tela de Detalhes (Counters)` ➔ `Ações de Admin (se aplicável)`
 
 ## 10. Tecnologias Utilizadas
-*   **Frontend:** React Native com Expo, React Navigation, AsyncStorage.
+*   **Frontend:** React Native com Expo, React Navigation, AsyncStorage, Expo Vector Icons.
 *   **Backend:** Node.js, Express, JWT (jsonwebtoken), BcryptJS.
 *   **Banco de Dados:** MySQL (mysql2).
 
@@ -59,11 +63,11 @@ Um aplicativo mobile de consulta rápida que lista todos os heróis do jogo. Ao 
 **1. Configurar o Banco de Dados**
 *   Abra o seu gerenciador do MySQL (Workbench, phpMyAdmin, etc).
 *   Execute o script `database.sql` que está na raiz do projeto para criar o banco e as tabelas.
-*   **Nota:** O script já inclui as chaves estrangeiras com `ON DELETE CASCADE` para que a exclusão de heróis funcione corretamente.
+*   **Nota:** O script já inclui a coluna `foto_url` e as chaves estrangeiras com `ON DELETE CASCADE`.
 
 **2. Configurar o Backend**
 *   Abra a pasta `backend` no terminal.
-*   Crie um arquivo chamado `.env` e adicione as variáveis de ambiente (veja o exemplo `.env.example` abaixo):
+*   Crie um arquivo chamado `.env` e adicione as variáveis de ambiente:
     ```env
     DB_HOST=localhost
     DB_PORT=3306

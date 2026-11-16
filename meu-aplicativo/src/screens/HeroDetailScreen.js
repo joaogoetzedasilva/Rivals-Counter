@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchComToken } from '../services/api';
+
+// URL DA FOTO PADRÃO
+const FOTO_PADRAO = 'https://th.bing.com/th/id/OIP.WEfeyAPDfp4AaiHnadfTRwAAAA?w=165&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3';
 
 export default function HeroDetailScreen({ route, navigation }) {
   const { heroId, heroName } = route.params;
@@ -10,7 +13,6 @@ export default function HeroDetailScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
   
-  // Controle dos Modais
   const [modalVisible, setModalVisible] = useState(false);
   const [modalConfirmVisible, setModalConfirmVisible] = useState(false);
   const [counterSelecionado, setCounterSelecionado] = useState(null);
@@ -105,6 +107,9 @@ export default function HeroDetailScreen({ route, navigation }) {
         ListEmptyComponent={<Text style={{ color: '#fff', textAlign: 'center', marginTop: 20 }}>Nenhum counter cadastrado para este herói.</Text>}
         renderItem={({ item }) => (
           <View style={styles.counterCard}>
+            {/* USA A FOTO DO COUNTER OU A PADRÃO */}
+            <Image source={{ uri: item.counter_foto || FOTO_PADRAO }} style={styles.counterImage} />
+
             <View style={styles.cardInfo}>
               <Text style={styles.counterName}>{item.counter_nome} ({item.counter_funcao})</Text>
               <Text style={styles.tip}>{item.dica_tatica}</Text>
@@ -172,6 +177,7 @@ const styles = StyleSheet.create({
   title: { color: '#fff', fontSize: 22, fontWeight: 'bold', flex: 1 },
   addIconButton: { padding: 4 },
   counterCard: { backgroundColor: '#1c2333', padding: 14, borderRadius: 10, marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  counterImage: { width: 60, height: 60, borderRadius: 30, marginRight: 12, backgroundColor: '#333' },
   cardInfo: { flex: 1, paddingRight: 10 },
   counterName: { color: '#e62429', fontSize: 17, fontWeight: 'bold' },
   tip: { color: '#ccc', marginTop: 6, lineHeight: 20 },

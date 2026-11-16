@@ -92,7 +92,7 @@ app.get('/herois/:id/counters', autenticarToken, async (req, res) => {
     const { id } = req.params;
     try {
         const [rows] = await db.query(`
-            SELECT c.id, c.counter_hero_id, c.dica_tatica, h.nome AS counter_nome, h.funcao AS counter_funcao
+            SELECT c.id, c.counter_hero_id, c.dica_tatica, h.nome AS counter_nome, h.funcao AS counter_funcao, h.foto_url AS counter_foto
             FROM counters c
             JOIN herois h ON c.counter_hero_id = h.id
             WHERE c.hero_id = ?
@@ -104,18 +104,30 @@ app.get('/herois/:id/counters', autenticarToken, async (req, res) => {
 });
 
 app.post('/herois', autenticarToken, somenteAdmin, async (req, res) => {
-    const { nome, funcao } = req.body;
+    const { nome, funcao, foto_url } = req.body;
     if (!nome || !funcao) return res.status(400).json({ error: 'Nome e função são obrigatórios.' });
 
     try {
-        const [resultado] = await db.query('INSERT INTO herois (nome, funcao) VALUES (?, ?)', [nome, funcao]);
+        const [resultado] = await db.query('INSERT INTO herois (nome, funcao, foto_url) VALUES (?, ?, ?)', [nome, funcao, foto_url]);
         res.status(201).json({ mensagem: 'Herói cadastrado!', id: resultado.insertId });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao cadastrar herói.' });
     }
 });
 
-// Rota para DELETAR herói (com tratamento de erro de Foreign Key)
+app.put('/herois/:id', autenticarToken, somenteAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { nome, funcao, foto_url } = req.body;
+    if (!nome || !funcao) return res.status(400).json({ error: 'Nome e função são obrigatórios.' });
+
+    try {
+        await db.query('UPDATE herois SET nome = ?, funcao = ?, foto_url = ? WHERE id = ?', [nome, funcao, foto_url, id]);
+        res.json({ mensagem: 'Herói atualizado com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao atualizar herói.' });
+    }
+});
+
 app.delete('/herois/:id', autenticarToken, somenteAdmin, async (req, res) => {
     try {
         await db.query('DELETE FROM herois WHERE id = ?', [req.params.id]);
@@ -126,20 +138,6 @@ app.delete('/herois/:id', autenticarToken, somenteAdmin, async (req, res) => {
             return res.status(400).json({ error: 'Não é possível excluir: este herói é counter de outro.' });
         }
         res.status(500).json({ error: 'Erro ao excluir herói.' });
-    }
-});
-
-// Rota NOVA para EDITAR herói
-app.put('/herois/:id', autenticarToken, somenteAdmin, async (req, res) => {
-    const { id } = req.params;
-    const { nome, funcao } = req.body;
-    if (!nome || !funcao) return res.status(400).json({ error: 'Nome e função são obrigatórios.' });
-
-    try {
-        await db.query('UPDATE herois SET nome = ?, funcao = ? WHERE id = ?', [nome, funcao, id]);
-        res.json({ mensagem: 'Herói atualizado com sucesso.' });
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao atualizar herói.' });
     }
 });
 

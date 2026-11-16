@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
+import SelecaoFuncaoScreen from './src/screens/SelecaoFuncaoScreen'; // IMPORTANDO A NOVA TELA
 import HeroesListScreen from './src/screens/HeroesListScreen';
 import HeroDetailScreen from './src/screens/HeroDetailScreen';
 import CadastrarHeroiScreen from './src/screens/CadastrarHeroiScreen';
@@ -16,14 +17,10 @@ import EditarCounterScreen from './src/screens/EditarCounterScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  // Função de Logout
   async function sair(navigation) {
     await AsyncStorage.removeItem('@rivals_token');
     await AsyncStorage.removeItem('@rivals_user');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
   }
 
   return (
@@ -36,13 +33,15 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Entrar', headerShown: false }} />
-        <Stack.Screen name="Cadastro" component={CadastroScreen} options={{ title: 'Criar Conta' }} />
+        <Stack.Screen name="Cadastro" component={CadastroScreen} options={{ title: 'Criar Conta', headerShown: false }} />
         
+        {/* NOVA TELA DE SELEÇÃO */}
         <Stack.Screen 
-          name="HeroesList" 
-          component={HeroesListScreen} 
+          name="SelecaoFuncao" 
+          component={SelecaoFuncaoScreen} 
           options={({ navigation }) => ({ 
-            title: 'Heróis',
+            title: 'Classes',
+            headerBackVisible: false, // Esconde o botão de voltar para o Login
             headerRight: () => (
               <TouchableOpacity onPress={() => sair(navigation)} style={{ marginRight: 10 }}>
                 <Text style={{ color: '#e62429', fontWeight: 'bold' }}>Sair</Text>
@@ -50,13 +49,13 @@ export default function App() {
             )
           })} 
         />
-        
+
+        <Stack.Screen name="HeroesList" component={HeroesListScreen} options={{ title: 'Heróis' }} />
         <Stack.Screen name="HeroDetail" component={HeroDetailScreen} options={{ title: 'Counters' }} />
         <Stack.Screen name="CadastrarHeroi" component={CadastrarHeroiScreen} options={{ title: 'Novo Herói' }} />
         <Stack.Screen name="EditarHeroi" component={EditarHeroiScreen} options={{ title: 'Editar Herói' }} />
         <Stack.Screen name="CadastrarCounter" component={CadastrarCounterScreen} options={{ title: 'Novo Counter' }} />
         <Stack.Screen name="EditarCounter" component={EditarCounterScreen} options={{ title: 'Editar Counter' }} />
-
       </Stack.Navigator>
     </NavigationContainer>
   );

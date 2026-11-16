@@ -1,35 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { fetchComToken } from '../services/api';
 
 export default function EditarHeroiScreen({ route, navigation }) {
-  const { heroId, nomeAtual, funcaoAtual } = route.params;
+  const { heroId, nomeAtual, funcaoAtual, fotoAtual } = route.params;
   
   const [nome, setNome] = useState(nomeAtual);
   const [funcao, setFuncao] = useState(funcaoAtual);
+  const [fotoUrl, setFotoUrl] = useState(fotoAtual || '');
   const [enviando, setEnviando] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [mensagem, setMensagem] = useState('');
+
   async function salvarEdicao() {
-    if (!nome || !funcao) return Alert.alert('Erro', 'Preencha todos os campos.');
+    if (!nome || !funcao) {
+      setMensagem('Preencha todos os campos.');
+      setModalVisible(true);
+      return;
+    }
     setEnviando(true);
     
     try {
       const res = await fetchComToken(`/herois/${heroId}`, {
         method: 'PUT',
-        body: JSON.stringify({ nome, funcao })
+        body: JSON.stringify({ nome, funcao, foto_url: fotoUrl })
       });
 
       if (res.ok) {
-        Alert.alert('Sucesso', 'Herói atualizado!');
-        navigation.goBack();
+        setMensagem('Herói atualizado com sucesso!');
+        setModalVisible(true);
       } else {
-        const data = await res.json();
-        Alert.alert('Erro', data.error || 'Falha ao atualizar.');
+        setMensagem('Falha ao atualizar.');
+        setModalVisible(true);
       }
     } catch (error) {
-      Alert.alert('Erro', 'Falha na conexão.');
+      setMensagem('Falha na conexão.');
+      setModalVisible(true);
     } finally {
       setEnviando(false);
+    }
+  }
+
+  function fecharModal() {
+    setModalVisible(false);
+    if (mensagem.includes('sucesso')) {
+      navigation.goBack();
     }
   }
 
@@ -38,9 +54,23 @@ export default function EditarHeroiScreen({ route, navigation }) {
       <Text style={styles.title}>Editar Herói</Text>
       <TextInput style={styles.input} placeholder="Nome do Herói" placeholderTextColor="#888" value={nome} onChangeText={setNome} />
       <TextInput style={styles.input} placeholder="Função" placeholderTextColor="#888" value={funcao} onChangeText={setFuncao} />
+      <TextInput style={styles.input} placeholder="URL da Foto" placeholderTextColor="#888" value={fotoUrl} onChangeText={setFotoUrl} autoCapitalize="none" />
+      
       <TouchableOpacity style={styles.button} onPress={salvarEdicao} disabled={enviando}>
         <Text style={styles.buttonText}>{enviando ? 'Salvando...' : 'Salvar Alterações'}</Text>
       </TouchableOpacity>
+
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{mensagem.includes('sucesso') ? 'Sucesso!' : 'Aviso'}</Text>
+            <Text style={{ color: '#ccc', textAlign: 'center', marginBottom: 20 }}>{mensagem}</Text>
+            <TouchableOpacity style={styles.button} onPress={fecharModal}>
+              <Text style={styles.buttonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -51,4 +81,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#1c2333', color: '#fff', padding: 14, borderRadius: 8, marginBottom: 12 },
   button: { backgroundColor: '#e62429', padding: 16, borderRadius: 8, marginTop: 12 },
   buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold', fontSize: 16 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '80%', backgroundColor: '#1c2333', borderRadius: 12, padding: 20 },
+  modalTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
 });
