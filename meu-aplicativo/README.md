@@ -23,16 +23,16 @@ Um aplicativo mobile de consulta rápida que lista todos os heróis do jogo. Ao 
 ## 7. Funcionalidades Implementadas
 *   **Autenticação JWT:** Cadastro e login de usuários com senhas criptografadas (hash com bcrypt) e geração de Token JWT.
 *   **Níveis de Acesso:** Rotas protegidas no backend que diferenciam usuários comuns de administradores.
-*   **CRUD de Heróis:** Listagem, cadastro, edição e exclusão de heróis (apenas admins podem modificar).
-*   **CRUD de Counters:** Associação de um herói como "counter" de outro, com dicas táticas. Edição e exclusão disponíveis para admins.
-*   **Fotos de Heróis:** Opção de cadastrar a URL da foto do herói. Caso não seja informada, o app usa uma imagem padrão.
-*   **Organização Visual (SectionList):** A lista de heróis é dividida em seções (Tanques, Dano, Suporte) e ordenada alfabeticamente dentro de cada seção.
-*   **Filtro de Função:** Tela inicial após o login permite escolher qual classe visualizar (Todas, Vanguard, Duelist, Strategist).
-*   **Melhorias de UX:** Modais customizados para confirmação e feedback (funcionam perfeitamente na versão Web), evitando bugs com o `Alert.alert` nativo.
+*   **CRUD de Heróis:** Listagem, cadastro, edição e exclusão de heróis.
+*   **CRUD de Counters:** Associação de um herói como "counter" de outro, com dicas táticas.
+*   **Fotos de Heróis:** Opção de cadastrar a URL da foto do herói, com fallback para uma imagem padrão.
+*   **Organização Visual:** A lista de heróis é dividida em seções (Tanques, Dano, Suporte) e ordenada alfabeticamente.
+*   **Filtro de Função:** Tela inicial permite escolher qual classe visualizar.
+*   **Melhorias de UX:** Modais customizados para confirmação e feedback (funcionam perfeitamente na versão Web).
 
 ## 8. Telas do Aplicativo
 *   **Tela 1:** Login (com fundo personalizado).
-*   **Tela 2:** Cadastro de Novo Usuário (mesmo visual do Login).
+*   **Tela 2:** Cadastro de Novo Usuário.
 *   **Tela 3:** Seleção de Função (escolher qual classe ver).
 *   **Tela 4:** Lista de Heróis (organizada por seções e com fotos).
 *   **Tela 5:** Detalhes do Herói (lista de counters com fotos e dicas).
@@ -63,7 +63,6 @@ Um aplicativo mobile de consulta rápida que lista todos os heróis do jogo. Ao 
 **1. Configurar o Banco de Dados**
 *   Abra o seu gerenciador do MySQL (Workbench, phpMyAdmin, etc).
 *   Execute o script `database.sql` que está na raiz do projeto para criar o banco e as tabelas.
-*   **Nota:** O script já inclui a coluna `foto_url` e as chaves estrangeiras com `ON DELETE CASCADE`.
 
 **2. Configurar o Backend**
 *   Abra a pasta `backend` no terminal.

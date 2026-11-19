@@ -1,8 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-export const API_URL = 'http://172.20.135.53:3000';
+// Lógica para descobrir a URL da API automaticamente
+let API_URL = 'http://localhost:3000';
 
-// Função que busca o token salvo e envia em todas as requisições
+if (Platform.OS !== 'web' && Constants.expoConfig?.hostUri) {
+  const host = Constants.expoConfig.hostUri.split(':')[0];
+  API_URL = `http://${host}:3000`;
+}
+
+export { API_URL };
+
 export async function fetchComToken(rota, opcoes = {}) {
   const token = await AsyncStorage.getItem('@rivals_token');
   
