@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'http://localhost:3000';
+export const API_URL = 'http://172.20.135.53:3000';
 
 // Função que busca o token salvo e envia em todas as requisições
 export async function fetchComToken(rota, opcoes = {}) {
